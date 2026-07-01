@@ -38,6 +38,25 @@ SOURCES = [
         "id_prefix": "js-auto-",
     },
     {
+        "name": "浙江省税务局-热点问答",
+        "region": "浙江",
+        "category": "地方文件",
+        "subCategory": "热点问答",
+        "url": "https://zhejiang.chinatax.gov.cn/col/col13296/index.html",
+        "base_url": "https://zhejiang.chinatax.gov.cn",
+        "id_prefix": "zj-qa-",
+        "section_tag": "热点问答",
+    },
+    {
+        "name": "江苏省税务局-12366热点问答",
+        "region": "江苏",
+        "category": "地方文件",
+        "subCategory": "热点问答",
+        "url": "https://jiangsu.chinatax.gov.cn/col/col8353/index.html",
+        "base_url": "https://jiangsu.chinatax.gov.cn",
+        "id_prefix": "js-qa-",
+    },
+    {
         "name": "国家税务总局-最新文件",
         "region": "全国",
         "category": "税收征管",
@@ -75,9 +94,17 @@ def extract_items(html, source):
     """Extract items from HTML list page"""
     items = []
     base = source.get('base_url', '')
+    section_tag = source.get('section_tag', '')
+
+    # If section_tag specified, only extract from that section
+    if section_tag:
+        idx = html.find(section_tag)
+        if idx > 0:
+            html = html[idx:idx+20000]
+        else:
+            return []
 
     # Pattern: date + link (common in gov sites)
-    # 2026-06-05 ... <a href="...">title</a>
     patterns = [
         # <li>...date...<a href="...">title</a>...</li>
         re.compile(
@@ -134,19 +161,17 @@ INCLUDE_KW = [
     '发票', '征收管理', '扣除', '优惠', '减免', '退税', '抵扣',
     '征收率', '税率', '计税', '财税', '税收', '社保', '社会保险', '缴费',
     '非税收入', '财政', '出口退税', '留抵退税', '加计抵减',
-    '废止', '修改', '规范性文件', '政策',
+    '废止', '修改', '规范性文件', '政策', '热点问答', '12366',
 ]
 
 EXCLUDE_KW = [
     '招聘', '公示', '公务员', '任前', '任免', '采购', '招标', '中标',
     '面试', '体检', '考察', '录用', '事业单位', '人大', '政协', '提案',
     '领导活动', '会议', '党建', '党史', '学习', '解读', '图解',
-    '我单位', '我是', '哪些人', '问题', '解答',
     '税路通', '合规宝典', '信用管理', '网上办税',
     '纳税缴费', '诚信纳税',
-    '企业安置残疾人员',  # Q&A style
-    '境外投资者以分配利润直接投资税收抵免',  # policy intro page, not regulation
-    '关于《国家税务',  # 解读类文章，非法规原文
+    '境外投资者以分配利润直接投资税收抵免',
+    '关于《国家税务',
     '关于《财政部',
 ]
 
