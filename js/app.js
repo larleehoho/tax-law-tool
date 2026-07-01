@@ -196,7 +196,7 @@
     let tp=Math.ceil(docs.length/PS)||1; if(currentPageIdx>tp)currentPageIdx=tp;
     let start=(currentPageIdx-1)*PS, pageItems=docs.slice(start,start+PS);
     let groups={}; pageItems.forEach(l=>{ if(!groups[l.category])groups[l.category]=[]; groups[l.category].push(l); });
-    ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','地方文件'].forEach(cat=>{
+    ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','热点问答','地方文件'].forEach(cat=>{
       if(!groups[cat])return;
       let g=document.createElement('div'); g.className='cat-group';
       g.innerHTML=`<div class="cat-header"><span>${cat}</span><span class="cat-count">${groups[cat].length}项</span></div>`;
@@ -246,7 +246,7 @@
       let groups={}; results.forEach(l=>{if(!groups[l.category])groups[l.category]=[];groups[l.category].push(l);});
       let c=$('categoryList');
       c.innerHTML=`<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">搜索 "${v}" 找到 ${results.length} 条法规</div>`;
-      ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','地方文件'].forEach(cat=>{
+      ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','热点问答','地方文件'].forEach(cat=>{
         if(!groups[cat])return;
         let g=document.createElement('div'); g.className='cat-group';
         g.innerHTML=`<div class="cat-header">${cat}<span class="cat-count">${groups[cat].length}项</span></div>`;
