@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <title>税法速查 · 会计专属</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="app-header">
+    <div class="header-left">
+      <button id="menuBtn" class="icon-btn" aria-label="菜单">☰</button>
+      <h1 class="app-title">📜 税法速查</h1>
+    </div>
+    <div class="header-right">
+      <button id="searchToggleBtn" class="icon-btn" aria-label="搜索">🔍</button>
+      <button id="favToggleBtn" class="icon-btn" aria-label="收藏">⭐</button>
+    </div>
+  </header>
+
+  <!-- 搜索栏（默认隐藏） -->
+  <div id="searchBar" class="search-bar hidden">
+    <input type="text" id="searchInput" placeholder="搜索法规名称、条款关键词..." autocomplete="off">
+    <button id="searchClearBtn" class="icon-btn-sm">✕</button>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="app-main" id="appMain">
+    <!-- 分类列表页 -->
+    <section id="pageCategories" class="page active">
+      <!-- 快捷操作 -->
+      <div class="quick-actions">
+        <button class="quick-btn" data-filter="all">📋 全部</button>
+        <button class="quick-btn" data-filter="favorites">⭐ 收藏</button>
+        <button class="quick-btn" data-filter="recent">🕐 最近</button>
+        <button class="quick-btn" data-filter="updated">🔄 新更新</button>
+      </div>
+
+      <!-- 分类导航 -->
+      <nav class="category-nav" id="categoryNav"></nav>
+    </section>
+
+    <!-- 法规列表页 -->
+    <section id="pageDocList" class="page">
+      <div class="page-subtitle" id="listTitle">法规列表</div>
+      <div class="doc-list" id="docList"></div>
+    </section>
+
+    <!-- 法规详情页 -->
+    <section id="pageDocDetail" class="page">
+      <div class="doc-detail-header" id="detailHeader"></div>
+      <div class="doc-detail-body" id="detailBody"></div>
+    </section>
+  </main>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="categories">📂 分类</button>
+    <button class="nav-btn" data-page="favorites">⭐ 收藏</button>
+    <button class="nav-btn" data-page="search-global">🔍 搜索</button>
+    <button class="nav-btn" data-page="settings">⚙️ 设置</button>
+  </nav>
+
+  <!-- 侧边菜单 -->
+  <div id="sideMenu" class="side-menu hidden">
+    <div class="side-menu-overlay" id="menuOverlay"></div>
+    <div class="side-menu-content">
+      <div class="side-menu-header">
+        <h2>税法速查</h2>
+        <span class="version">v1.0</span>
+      </div>
+      <div class="side-menu-body">
+        <div class="menu-section">
+          <h3>数据概览</h3>
+          <p id="dataStats">加载中...</p>
+        </div>
+        <div class="menu-section">
+          <h3>更新检测</h3>
+          <p id="updateInfo">上次检测：--</p>
+          <button id="checkUpdateBtn" class="btn-secondary">🔄 手动检测更新</button>
+        </div>
+        <div class="menu-section">
+          <h3>关于</h3>
+          <p>会计专属税法法规速查工具</p>
+          <p class="text-small">数据来源：国家税务总局、江苏省税务局、浙江省税务局</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 独立搜索页 -->
+  <section id="pageSearchGlobal" class="page">
+    <div class="search-global-box">
+      <input type="text" id="searchGlobalInput" placeholder="输入关键词搜索全部法规..." autofocus>
+    </div>
+    <div class="search-global-results" id="searchGlobalResults">
+      <p class="text-muted">输入关键词开始搜索</p>
+    </div>
+  </section>
+
+  <!-- 收藏页 -->
+  <section id="pageFavorites" class="page">
+    <h2 class="page-title">⭐ 我的收藏</h2>
+    <div id="favList" class="doc-list"></div>
+    <p id="favEmpty" class="text-muted empty-hint">还没有收藏的法规，浏览时点击 ⭐ 即可收藏</p>
+  </section>
+
+  <!-- 设置页 -->
+  <section id="pageSettings" class="page">
+    <h2 class="page-title">⚙️ 设置</h2>
+    <div class="settings-group">
+      <label class="setting-item">
+        <span>深色模式</span>
+        <input type="checkbox" id="darkModeToggle">
+      </label>
+      <label class="setting-item">
+        <span>收藏同步到本地存储</span>
+        <span class="badge">已启用</span>
+      </label>
+    </div>
+    <div class="settings-group">
+      <h3>数据管理</h3>
+      <button id="exportFavBtn" class="btn-secondary">📤 导出收藏</button>
+      <button id="clearCacheBtn" class="btn-secondary btn-danger">🗑️ 清除缓存</button>
+    </div>
+    <div class="settings-group">
+      <h3>关于</h3>
+      <p>税法速查 v1.0</p>
+      <p>专为会计人员设计的税法法规查询工具</p>
+      <p>安装到桌面可获得更好的使用体验</p>
+    </div>
+  </section>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
