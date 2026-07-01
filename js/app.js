@@ -212,16 +212,59 @@
       $('prevBtn')?.addEventListener('click',()=>{ if(currentPageIdx>1){currentPageIdx--;renderHome();$('appBody').scrollTop=0;} });
       $('nextBtn')?.addEventListener('click',()=>{ if(currentPageIdx<tp){currentPageIdx++;renderHome();$('appBody').scrollTop=0;} });
     }
-    // QA column: all hot Q&A items
+    // QA column: show top 5 per province, collapsible
     let qaLaws=laws.filter(l=>l.category==='热点问答');
     if(qaLaws.length>0){
-      qaCol.innerHTML=`<div class="cat-group"><div class="cat-header"><span>🔥 热点问答</span><span class="cat-count">${qaLaws.length}项</span></div></div>`;
-      qaLaws.forEach(d=>{
-        let item=document.createElement('div'); item.className='qa-item';
-        let summary=d.summary||(Array.isArray(d.content)?d.content.slice(0,3).map(s=>s.text.replace(/\n/g,'')).filter(Boolean).join('\n').slice(0,120):'');
-        item.innerHTML=`<div class="qa-item-title">${d.title}</div><div class="qa-item-meta">${d.region||'全国'} · ${d.publishDate||''}</div>`;
-        item.addEventListener('click',()=>showDetail(d));
-        qaCol.appendChild(item);
+      // Group by region
+      let qaGroups={};
+      qaLaws.forEach(d=>{ let r=d.region||'其他'; if(!qaGroups[r]) qaGroups[r]=[]; qaGroups[r].push(d); });
+      let colHtml=`<div class="cat-group"><div class="cat-header"><span>🔥 热点问答</span><span class="cat-count">${qaLaws.length}项</span></div>`;
+      Object.keys(qaGroups).sort().forEach(region=>{
+        let items=qaGroups[region];
+        colHtml+=`<div style="padding:8px 16px 0;font-size:12px;font-weight:600;color:var(--text-secondary);">📍 ${region}</div>`;
+        let showCount=Math.min(5, items.length);
+        for(let i=0;i<showCount;i++){
+          let d=items[i];
+          colHtml+=`<div class="qa-item" data-id="${d.id}"><div class="qa-item-title">${d.title}</div><div class="qa-item-meta">${d.publishDate||''}</div></div>`;
+        }
+        if(items.length>5){
+          colHtml+=`<div class="qa-more" data-region="${region}" style="padding:8px 16px;font-size:13px;color:var(--primary);cursor:pointer;text-align:center;border-bottom:1px solid var(--border);">📌 查看全部${items.length}条 ›</div>`;
+        }
+      });
+      colHtml+='</div>';
+      qaCol.innerHTML=colHtml;
+      // Bind click events
+      qaCol.querySelectorAll('.qa-item').forEach(el=>{
+        let doc=qaLaws.find(l=>l.id===el.dataset.id);
+        if(doc) el.addEventListener('click',()=>showDetail(doc));
+      });
+      qaCol.querySelectorAll('.qa-more').forEach(el=>{
+        el.addEventListener('click',()=>{
+          let region=el.dataset.region;
+          let items=qaLaws.filter(l=>(l.region||'其他')===region);
+          if(el.classList.contains('expanded')){
+            // Collapse back to 5
+            let parent=el.parentElement;
+            // Remove extra items
+            let extras=parent.querySelectorAll('.qa-item-extra');
+            extras.forEach(e=>e.remove());
+            el.classList.remove('expanded');
+            el.innerHTML=`📌 查看全部${items.length}条 ›`;
+          } else {
+            // Expand: show remaining
+            let parent=el.parentElement;
+            let shown=parent.querySelectorAll('.qa-item').length;
+            for(let i=5;i<items.length;i++){
+              let d=items[i];
+              let item=document.createElement('div'); item.className='qa-item qa-item-extra'; item.dataset.id=d.id;
+              item.innerHTML=`<div class="qa-item-title">${d.title}</div><div class="qa-item-meta">${d.publishDate||''}</div>`;
+              item.addEventListener('click',()=>showDetail(d));
+              parent.insertBefore(item, el);
+            }
+            el.classList.add('expanded');
+            el.innerHTML=`📌 收起`;
+          }
+        });
       });
     }
   }
