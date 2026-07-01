@@ -189,6 +189,7 @@
   // ===== Home =====
   function renderHome(){
     let c=$('categoryList'); c.innerHTML='';
+    let qaCol=$('qaColumn'); qaCol.innerHTML='';
     let docs=[];
     if(currentFilter==='fav') docs=laws.filter(l=>favorites.includes(l.id));
     else if(currentFilter==='recent'){ let rec=JSON.parse(localStorage.getItem('trecent')||'[]'); docs=laws.filter(l=>rec.includes(l.id)); }
@@ -196,7 +197,7 @@
     let tp=Math.ceil(docs.length/PS)||1; if(currentPageIdx>tp)currentPageIdx=tp;
     let start=(currentPageIdx-1)*PS, pageItems=docs.slice(start,start+PS);
     let groups={}; pageItems.forEach(l=>{ if(!groups[l.category])groups[l.category]=[]; groups[l.category].push(l); });
-    ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','热点问答','地方文件'].forEach(cat=>{
+    ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','地方文件'].forEach(cat=>{
       if(!groups[cat])return;
       let g=document.createElement('div'); g.className='cat-group';
       g.innerHTML=`<div class="cat-header"><span>${cat}</span><span class="cat-count">${groups[cat].length}项</span></div>`;
@@ -204,11 +205,25 @@
       groups[cat].forEach(d=>b.appendChild(mkRow(d))); g.appendChild(b); c.appendChild(g);
     });
     if(docs.length===0) c.innerHTML='<div class="empty-hint">暂无内容</div>';
+    // Pagination for main column
     let p=$('pagination');
-    if(tp<=1){ p.innerHTML=''; return; }
-    p.innerHTML=`<button class="page-btn" id="prevBtn" ${currentPageIdx<=1?'disabled':''}>← 上一页</button><span class="page-info">${currentPageIdx}/${tp}</span><button class="page-btn" id="nextBtn" ${currentPageIdx>=tp?'disabled':''}>下一页 →</button>`;
-    $('prevBtn')?.addEventListener('click',()=>{ if(currentPageIdx>1){currentPageIdx--;renderHome();$('appBody').scrollTop=0;} });
-    $('nextBtn')?.addEventListener('click',()=>{ if(currentPageIdx<tp){currentPageIdx++;renderHome();$('appBody').scrollTop=0;} });
+    if(tp<=1){ p.innerHTML=''; } else {
+      p.innerHTML=`<button class="page-btn" id="prevBtn" ${currentPageIdx<=1?'disabled':''}>← 上一页</button><span class="page-info">${currentPageIdx}/${tp}</span><button class="page-btn" id="nextBtn" ${currentPageIdx>=tp?'disabled':''}>下一页 →</button>`;
+      $('prevBtn')?.addEventListener('click',()=>{ if(currentPageIdx>1){currentPageIdx--;renderHome();$('appBody').scrollTop=0;} });
+      $('nextBtn')?.addEventListener('click',()=>{ if(currentPageIdx<tp){currentPageIdx++;renderHome();$('appBody').scrollTop=0;} });
+    }
+    // QA column: all hot Q&A items
+    let qaLaws=laws.filter(l=>l.category==='热点问答');
+    if(qaLaws.length>0){
+      qaCol.innerHTML=`<div class="cat-group"><div class="cat-header"><span>🔥 热点问答</span><span class="cat-count">${qaLaws.length}项</span></div></div>`;
+      qaLaws.forEach(d=>{
+        let item=document.createElement('div'); item.className='qa-item';
+        let summary=d.summary||(Array.isArray(d.content)?d.content.slice(0,3).map(s=>s.text.replace(/\n/g,'')).filter(Boolean).join('\n').slice(0,120):'');
+        item.innerHTML=`<div class="qa-item-title">${d.title}</div><div class="qa-item-meta">${d.region||'全国'} · ${d.publishDate||''}</div>`;
+        item.addEventListener('click',()=>showDetail(d));
+        qaCol.appendChild(item);
+      });
+    }
   }
 
   // ===== Init =====

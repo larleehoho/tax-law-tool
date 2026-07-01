@@ -27,6 +27,7 @@ SOURCES = [
         "url": "https://zhejiang.chinatax.gov.cn/col/col13296/index.html",
         "base_url": "https://zhejiang.chinatax.gov.cn",
         "id_prefix": "zj-auto-",
+        "exclude_tag": "热点问答",
     },
     {
         "name": "江苏省税务局-最新文件",
@@ -95,6 +96,14 @@ def extract_items(html, source):
     items = []
     base = source.get('base_url', '')
     section_tag = source.get('section_tag', '')
+    exclude_tag = source.get('exclude_tag', '')
+
+    # If exclude_tag specified, truncate HTML before that section
+    if exclude_tag:
+        idx = html.find(exclude_tag)
+        if idx > 0:
+            # Keep everything before the excluded section
+            html = html[:idx]
 
     # If section_tag specified, only extract from that section
     if section_tag:
