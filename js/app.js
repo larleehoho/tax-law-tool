@@ -71,7 +71,7 @@
     });
 
     nav.innerHTML = '';
-    const categoryOrder = ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理'];
+    const categoryOrder = ['增值税','企业所得税','个人所得税','印花税','其他税费','税收征管','发票管理','地方文件']; 
     
     categoryOrder.forEach(cat => {
       if (!groups[cat]) return;
